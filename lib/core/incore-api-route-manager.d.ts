@@ -1,0 +1,31 @@
+import { ApiRouteInterface } from '../interfaces/api-route';
+import { Multer } from 'multer';
+import { IncoreApiActionsController } from './incore-api-actions-controller';
+import { IncoreApiRepository } from './incore-api-repository';
+import { IncoreApiRouteMiddleware } from '../interfaces/incore-api-route-middleware';
+import { IncoreAction } from '../type/incore-action';
+import { IncoreApiMiddlewareReturnType } from '../type/incore-middleware';
+import { IncoreModel } from './incore-model';
+export declare abstract class IncoreApiRouteManager<T, R extends IncoreApiRepository<T>> implements ApiRouteInterface {
+    private _path;
+    router: import("express-serve-static-core").Router;
+    protected controller: IncoreApiActionsController<T>;
+    protected middleware: IncoreApiRouteMiddleware[];
+    protected model: new () => IncoreModel;
+    constructor(model: new () => IncoreModel, path: string, middleware?: IncoreApiRouteMiddleware[]);
+    getMiddleware(action: IncoreAction): IncoreApiMiddlewareReturnType[];
+    get path(): string;
+    protected multer(path?: string): Multer;
+    protected abstract configure(): void;
+    protected abstract initializeRoutes(): void;
+    protected get readRoute(): string;
+    protected get updateRoute(): string;
+    protected get patchRoute(): string;
+    protected get createRoute(): string;
+    protected get upsertRoute(): string;
+    protected get loginRoute(): string;
+    protected get signupRoute(): string;
+    protected get refreshRoute(): string;
+    protected get deleteRoute(): string;
+    protected get deleteRoute2(): string;
+}
