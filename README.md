@@ -38,51 +38,51 @@ The _accessTokenExpiresIn_ and _refreshTokenExpiresIn_ properties are expressed 
 
 ```json
 {
-  "development": {
-    "knex": {
-      "client": "mysql",
-      "connection": {
-        "charset": "utf8",
-        "timezone": "America/Sao_Paulo",
-        "host": "localhost",
-        "database": "my_database",
-        "password": "123456",
-        "port": 3306,
-        "user": "root"
-      },
-      "pool": { "min": 2, "max": 10 },
-      "migrations": {
-        "directory": "src/databases/migrations",
-        "tableName": "migrations"
-      },
-      "seeds": { "directory": "src/databases/seeds" }
+    "development": {
+        "knex": {
+            "client": "mysql",
+            "connection": {
+                "charset": "utf8",
+                "timezone": "America/Sao_Paulo",
+                "host": "localhost",
+                "database": "my_database",
+                "password": "123456",
+                "port": 3306,
+                "user": "root"
+            },
+            "pool": { "min": 2, "max": 10 },
+            "migrations": {
+                "directory": "src/databases/migrations",
+                "tableName": "migrations"
+            },
+            "seeds": { "directory": "src/databases/seeds" }
+        },
+        "auth": {
+            "accessTokenExpiresIn": "24h",
+            "refreshTokenExpiresIn": "3d",
+            "tokenSecretKey": "The secret for HMAC algorithms, or the PEM encoded private key for RSA and ECDSA",
+            "refreshTokenSecretKey": "...",
+            "algorithm": "HS256"
+        },
+        "uploads": {
+            "path": "/var/www/html/site/",
+            "baseUrl": "http://example.com"
+        },
+        "routesRoles": {
+            "/users/": ["admin"],
+            "/create": ["*"],
+            "/del": ["admin"],
+            "/delete": ["admin"],
+            "/signup": ["*"],
+            "/v1/cars/create": ["admin"],
+            "/users/create": ["admin"],
+            "r:REGEX_PATTERN": ["admin"]
+        },
+        "newUsersRoles": ["users", "members"]
     },
-    "auth": {
-      "accessTokenExpiresIn": "24h",
-      "refreshTokenExpiresIn": "3d",
-      "tokenSecretKey": "The secret for HMAC algorithms, or the PEM encoded private key for RSA and ECDSA",
-      "refreshTokenSecretKey": "...",
-      "algorithm": "HS256"
-    },
-    "uploads": {
-      "path": "/var/www/html/site/",
-      "baseUrl": "http://example.com"
-    },
-    "routesRoles": {
-      "/users/": ["admin"],
-      "/create": ["*"],
-      "/del": ["admin"],
-      "/delete": ["admin"],
-      "/signup": ["*"],
-      "/v1/cars/create": ["admin"],
-      "/users/create": ["admin"],
-      "r:REGEX_PATTERN": ["admin"]
-    },
-    "newUsersRoles": ["users", "members"]
-  },
-  "test": {},
-  "preview": {},
-  "production": {}
+    "test": {},
+    "preview": {},
+    "production": {}
 }
 ```
 
@@ -103,37 +103,37 @@ After the first run a _knexfile.js_ file will be generated
 
 ```typescript
 const app = async () => {
-  const app = express();
+    const app = express()
 
-  app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+    app.use(cors())
+    app.use(express.json())
+    app.use(express.urlencoded({ extended: true }))
 
-  let server: Server;
+    let server: Server
 
-  const port = PORT || 3000;
+    const port = PORT || 3000
 
-  // ---| Required |---
+    // ---| Required |---
 
-  const env = process.env.NODE_ENV || "development";
+    const env = process.env.NODE_ENV || 'development'
 
-  // Use after: Incore.isTest | Incore.isDev | Incore.isProd | Incore.isPreview
-  Incore.env = IncoreEnv[env] || IncoreEnv.development;
+    // Use after: Incore.isTest | Incore.isDev | Incore.isProd | Incore.isPreview
+    Incore.env = IncoreEnv[env] || IncoreEnv.development
 
-  // It creates tables, routes, data and more
-  await Incore.bootstrap();
+    // It creates tables, routes, data and more
+    await Incore.bootstrap()
 
-  // Set version path or just /
-  app.use("/v1", Incore.router);
+    // Set version path or just /
+    app.use('/v1', Incore.router)
 
-  // ---| Required |---
+    // ---| Required |---
 
-  app.listen(port, () => {
-    console.log(`Server is running on PORT: ${port}`);
-  });
-};
+    app.listen(port, () => {
+        console.log(`Server is running on PORT: ${port}`)
+    })
+}
 
-export default app;
+export default app
 ```
 
 A complete api was created with just these lines above, with authentication, user tables already with users in it, products, addresses, cities and states, currently with all cities and states in Brazil
@@ -249,7 +249,7 @@ To send more than one relation in the embed statement, do this:
 
 ```json
 {
-  "embed": "[media, roles.[role], addresses.[district,city,state]]"
+    "embed": "[media, roles.[role], addresses.[district,city,state]]"
 }
 ```
 
@@ -263,9 +263,9 @@ POST http://localhost:3000/v1/auth/login
 
 ```json
 {
-  "login": "email@example.com",
-  "password": "123456",
-  "embed": "[media, roles.[role], addresses.[district,city,state]]"
+    "login": "email@example.com",
+    "password": "123456",
+    "embed": "[media, roles.[role], addresses.[district,city,state]]"
 }
 ```
 
@@ -326,58 +326,151 @@ POST http://localhost:3000/v1/auth/refresh
 
 Send the refresh token in the Authorization bearer header
 
+# User registration
+
+```http
+POST http://localhost:3000/v1/auth/signup
+```
+
+```json
+{
+    "data": {
+        "...": "..."
+    },
+    "conflict": [
+        {
+            "field": "email",
+            "op": "=",
+            "message": "This email already exists"
+        }
+    ]
+}
+```
+
+## User properties
+
+Send the following properties in "data" in JSON
+
+\* (mandatory)
+
+| Property                       | Type      | Description                                                    |
+| :----------------------------- | :-------- | :------------------------------------------------------------- |
+| `name`                         | `string`  | \* Username                                                    |
+| `first_name`                   | `string`  | First name                                                     |
+| `last_name`                    | `string`  | Last name                                                      |
+| `nickname`                     | `string`  | Nickname                                                       |
+| `social_addr`                  | `string`  | (Do not send) Created automatically by Incore when registering |
+| `trade_name`                   | `string`  | Business name                                                  |
+| `corporate_name`               | `string`  | Corporate Name                                                 |
+| `company_open_date`            | `string`  | Company opening date                                           |
+| `company_activity_code`        | `string`  | Example: CNAE                                                  |
+| `company_legal_nature`         | `string`  | Legal Nature                                                   |
+| `account_type`                 | `string`  | **individual** or **merchant**                                 |
+| `company_capital`              | `integer` | Company capital                                                |
+| `birth_date`                   | `string`  | \* Date of birth                                               |
+| `phone_number`                 | `string`  | Phone number                                                   |
+| `cpf`                          | `string`  | Registration of natural persons                                |
+| `rg`                           | `string`  | General registration                                           |
+| `ein`                          | `string`  | Employer Identification Number                                 |
+| `ssn`                          | `string`  | Social Security Number                                         |
+| `cnpj`                         | `string`  | Company registration number                                    |
+| `email`                        | `string`  | \* Email address                                               |
+| `professional_document_number` | `string`  | Professional document number                                   |
+| `about`                        | `string`  | About User                                                     |
+| `latitude`                     | `(10, 8)` | Latitude (decimal)                                             |
+| `longitude`                    | `(11, 8)` | Longitude (decimal)                                            |
+| `password`                     | `string`  | Password                                                       |
+
+The "conflict" property is for defining fields that cannot receive repeated entries
+
+In "op" are operators that we can use: **=, !=, >=, <, <=**
+
+Imagine that we don't want the same social security number to repeat and neither does the email
+
+**We do it like this:**
+
+You can omit the operator if it is **=**
+
+```json
+{
+    "date": {
+        "...": "..."
+    },
+    "conflict": [
+        {
+            "field": "email",
+            "message": "This email already exists"
+        },
+        {
+            "field": "ssn",
+            "message": "This number is already registered"
+        }
+    ]
+}
+```
+
+If it exists, Incore will return **BAD_REQUEST (400)** with the defined message
+
+# What do we understand so far?
+
+1. We understand that to register things we must send the object **"data"** and I can optionally send the property **"conflict"**
+
+2. We also know that to UPDATE we must send the **"data"** object and the item ID in JSON (id) or path
+
+3. To do DELETE we must send the item ID in JSON (id) or in the path
+
 # Structure created by Incore
 
 After running **await Incore.bootstrap()** for the first time the following structure was created internally
 
-- TABLES
-  - metadata
-  - users (contento 30 users (password: asd))
-  - media (for video and image, see uploads bellow)
-  - countries
-  - country_states
-  - cities
-  - addr_groups
-  - addresses
-  - districts
-  - products
-  - products_categories
-  - categories
-  - tags
-  - notifications
-  - roles (contento: admin, members, users)
-  - user_roles
-  - coupons
-  - professions
-  - cart
-  - cart_items
-  - merchants_config
-- ROUTES
-  - /metadata
-  - /auth
-  - /data
-  - /media
-  - /users
-  - /roles
-  - /users/roles
-  - /products
-  - /products/categories
-  - /categories
-  - /tags
-  - /cart
-  - /cart/items
-  - /merchant/config
-  - /notifications
-  - /countries
-  - /countries/states
-  - /countries/states/cities
-  - /countries/states/cities/districts
-  - /address
-  - /address/zipcode
-  - /address/groups
-  - /notifications
-  - /coupons
-  - /professions
+-   TABLES
+    -   metadata
+    -   users (contento 30 users (password: asd))
+    -   media (for video and image, see uploads bellow)
+    -   countries
+    -   country_states
+    -   cities
+    -   addr_groups
+    -   addresses
+    -   districts
+    -   products
+    -   products_categories
+    -   categories
+    -   tags
+    -   notifications
+    -   roles (contento: admin, members, users)
+    -   user_roles
+    -   coupons
+    -   professions
+    -   cart
+    -   cart_items
+    -   merchants_config
+-   ROUTES
+    -   /metadata
+    -   /auth
+    -   /data
+    -   /media
+    -   /users
+    -   /roles
+    -   /users/roles
+    -   /products
+    -   /products/categories
+    -   /categories
+    -   /tags
+    -   /cart
+    -   /cart/items
+    -   /merchant/config
+    -   /notifications
+    -   /countries
+    -   /countries/states
+    -   /countries/states/cities
+    -   /countries/states/cities/districts
+    -   /address
+    -   /address/zipcode
+    -   /address/groups
+    -   /notifications
+    -   /coupons
+    -   /professions
 
 Every route created by Incore has CRUD endpoints
 
@@ -411,14 +504,14 @@ If you are creating your tables using knex migration, you can use Incore's helpe
 
 ```typescript
 export const tableDefaults = (knex: Knex, table: Knex.CreateTableBuilder) => {
-  table.string("metadata_id").nullable();
-  table.dateTime("created_at").defaultTo(knex.fn.now());
-  table.dateTime("updated_at").nullable();
-  table.integer("status", 10).notNullable().defaultTo(IncoreStatus.ACTIVE);
-  table.engine("InnoDB");
-  table.charset("utf8mb4");
-  table.collate("utf8mb4_0900_ai_ci");
-};
+    table.string('metadata_id').nullable()
+    table.dateTime('created_at').defaultTo(knex.fn.now())
+    table.dateTime('updated_at').nullable()
+    table.integer('status', 10).notNullable().defaultTo(IncoreStatus.ACTIVE)
+    table.engine('InnoDB')
+    table.charset('utf8mb4')
+    table.collate('utf8mb4_0900_ai_ci')
+}
 ```
 
 If your logic has fields that are repeated then use the DRY pattern with this function, copy it and also add your own default fields without changing the ones that are already defined there, change its name so as not to conflict with the Incore standard
@@ -426,16 +519,16 @@ If your logic has fields that are repeated then use the DRY pattern with this fu
 **In practice within migration**
 
 ```typescript
-const hasTable = await knex.schema.hasTable("my_table");
+const hasTable = await knex.schema.hasTable('my_table')
 
 if (!hasTable) {
-  await knex.schema.createTable("my_table", (table) => {
-    table.bigIncrements("my_table_id").unsigned().primary();
-    // table....
+    await knex.schema.createTable('my_table', table => {
+        table.bigIncrements('my_table_id').unsigned().primary()
+        // table....
 
-    // Helper to create default data
-    tableDefaults(knex, table);
-  });
+        // Helper to create default data
+        tableDefaults(knex, table)
+    })
 }
 ```
 
@@ -473,39 +566,39 @@ idColumn
 
 ```typescript
 export class Car extends IncoreModel {
-  car_id?: number;
+    car_id?: number
 
-  color: string;
+    color: string
 
-  model: string;
+    model: string
 
-  static tableName = "cars";
+    static tableName = 'cars'
 
-  static idColumn = "car_id";
+    static idColumn = 'car_id'
 }
 
-export type CarInterface = IncoreModelInterface<Car>;
+export type CarInterface = IncoreModelInterface<Car>
 ```
 
 See how simple it is to create an interface for this model, just below each model write:
 
 ```typescript
-export type CarInterface = IncoreModelInterface<Car>;
+export type CarInterface = IncoreModelInterface<Car>
 ```
 
 After that you can use this interface to type your data
 
 ```typescript
-const someData: CarInterface;
+const someData: CarInterface
 ```
 
 **RECAP**
 
-- Create a model class
-  - set its properties
-  - set static tableName
-  - set static idColumn
-  - export type as above
+-   Create a model class
+    -   set its properties
+    -   set static tableName
+    -   set static idColumn
+    -   export type as above
 
 If you want to define a json schema for validation, write it inside the model
 
@@ -542,7 +635,7 @@ Imagine that I want only one driver of the car, for that I use the following
 
 ```typescript
 // Resulting in:
-const driver = data.item.driver;
+const driver = data.item.driver
 ```
 
 What if I want more drivers to return?
@@ -551,9 +644,9 @@ What if I want more drivers to return?
 
 ```typescript
 // Resulting in:
-data.item.driver.forEach((d) => {
-  console.log(d.name);
-});
+data.item.driver.forEach(d => {
+    console.log(d.name)
+})
 ```
 
 **Inside the model write the following:**
@@ -644,14 +737,14 @@ Now that we know how to create the model, let's create a route
 You can write your routes for example in a file called **routes.ts**. Done that we will insert our routes in it, which will be just an array, we will create a route for our model **Car** that was created above
 
 ```typescript
-import { IncoreRouteConfig } from "incore";
+import { IncoreRouteConfig } from 'incore'
 
 export const myRoutes: IncoreRouteConfig[] = [
-  {
-    path: "/cars",
-    model: Car,
-  },
-];
+    {
+        path: '/cars',
+        model: Car,
+    },
+]
 ```
 
 That's it, that's it for now, remembering that you need to follow the **IncoreRouteConfig** type.
@@ -665,9 +758,9 @@ Now let's go back to where we initialized everything and just above await **Inco
 // [...]
 
 // Registre suas rotas
-Incore.createRoutes(myRoutes);
+Incore.createRoutes(myRoutes)
 
-await Incore.bootstrap();
+await Incore.bootstrap()
 ```
 
 After that we can already make requests on this route
@@ -690,9 +783,9 @@ GET http://localhost:3000/v1/cars
 
 ```json
 {
-  "first": true,
-  "filters": [[["color", "!=", "blue"]]],
-  "embed": "[driver,docs]"
+    "first": true,
+    "filters": [[["color", "!=", "blue"]]],
+    "embed": "[driver,docs]"
 }
 ```
 
@@ -702,10 +795,10 @@ POST http://localhost:3000/v1/cars/create
 
 ```json
 {
-  "data": {
-    "color": "blue",
-    "model": "luxury"
-  }
+    "data": {
+        "color": "blue",
+        "model": "luxury"
+    }
 }
 ```
 
@@ -721,11 +814,11 @@ PUT http://localhost:3000/v1/cars/update/[ENCRYPTED_ID]
 
 ```json
 {
-  "id": "ENCRYPTED_ID",
-  "data": {
-    "color": "blue",
-    "model": "luxury"
-  }
+    "id": "ENCRYPTED_ID",
+    "data": {
+        "color": "blue",
+        "model": "luxury"
+    }
 }
 ```
 
@@ -754,29 +847,29 @@ Now imagine that you don't want an unauthenticated user to register and update c
 
 ```typescript
 const handlers: IncoreApiRouteHandler[] = [
-  {
-    handler: authMiddleware,
-  },
-  {
-    handler: myOtherMiddleware,
-    args: ["arg1"],
-  },
-];
+    {
+        handler: authMiddleware,
+    },
+    {
+        handler: myOtherMiddleware,
+        args: ['arg1'],
+    },
+]
 
 const middleware: IncoreApiRouteMiddleware[] = [
-  {
-    action: "CREATE",
-    middleware: handlers,
-  },
-  {
-    action: "UPDATE",
-    middleware: handlers,
-  },
-  {
-    action: "DELETE",
-    middleware: handlers,
-  },
-];
+    {
+        action: 'CREATE',
+        middleware: handlers,
+    },
+    {
+        action: 'UPDATE',
+        middleware: handlers,
+    },
+    {
+        action: 'DELETE',
+        middleware: handlers,
+    },
+]
 ```
 
 Above we already have our middleware that can now be added to as many routes as we want
@@ -787,17 +880,17 @@ As you may have noticed in **"myOtherMiddleware"**, it is possible to send argum
 
 ```typescript
 export const myRoutes: IncoreRouteConfig[] = [
-  {
-    path: "/cars",
-    model: Car,
-    middleware: middleware,
-  },
-  {
-    path: "/other/path",
-    model: OtherModel,
-    middleware: middleware,
-  },
-];
+    {
+        path: '/cars',
+        model: Car,
+        middleware: middleware,
+    },
+    {
+        path: '/other/path',
+        model: OtherModel,
+        middleware: middleware,
+    },
+]
 ```
 
 From now on when trying to register a car, update or delete it will only be possible if it is authenticated due to the middleware **authMiddleware**
@@ -921,77 +1014,77 @@ Inside here you can create your own queries, they are knex normal, the differenc
 
 ```typescript
 class MyModel extends IncoreModel {
-  prop: string;
+    prop: string
 
-  static tableName = "my_table";
+    static tableName = 'my_table'
 
-  static idColumn = "id_col";
+    static idColumn = 'id_col'
 
-  async doSomething(
-    arg1: string,
-    arg2: number,
-    arg3: boolean
-  ): Promise<IncoreApiResponse<MyModelInterface> | null> {
-    const { data, params, offset, page } = this.instructions();
+    async doSomething(
+        arg1: string,
+        arg2: number,
+        arg3: boolean
+    ): Promise<IncoreApiResponse<MyModelInterface> | null> {
+        const { data, params, offset, page } = this.instructions()
 
-    const expressRequest = this.repository().request;
+        const expressRequest = this.repository().request
 
-    // Write your own queries
-    // If you need a query from another table, use its model
-    const queryResult = await MyModel.query()
-      .where("..", "..")
-      .withGraphFetched(this.instructions().embed ?? "");
+        // Write your own queries
+        // If you need a query from another table, use its model
+        const queryResult = await MyModel.query()
+            .where('..', '..')
+            .withGraphFetched(this.instructions().embed ?? '')
 
-    // Stop and return your own answer
-    if (data.email == "abc@example.com") {
-      return {
-        code: IncoreResponseCode.FORBIDDEN,
-        message: "...",
-      };
-    } else {
-      // return your own result
-      // use item in the singular if it is a single result
-      // for example when using .first()
+        // Stop and return your own answer
+        if (data.email == 'abc@example.com') {
+            return {
+                code: IncoreResponseCode.FORBIDDEN,
+                message: '...',
+            }
+        } else {
+            // return your own result
+            // use item in the singular if it is a single result
+            // for example when using .first()
 
-      // Calculate the total results
-      const total = 50;
+            // Calculate the total results
+            const total = 50
 
-      const navigation = this.navigation(total, page);
+            const navigation = this.navigation(total, page)
 
-      return {
-        code: IncoreResponseCode.OK,
-        items: queryResult,
-        navigation: navigation,
-      };
+            return {
+                code: IncoreResponseCode.OK,
+                items: queryResult,
+                navigation: navigation,
+            }
+        }
+
+        // Change the instructions if needed
+        const newInstructions = {
+            ...this.instructions(),
+            first: true,
+        }
+
+        // Pass the new instructions to the repository
+        this.repository().apiInstructions = newInstructions
+
+        // continue normally
+        return null
     }
-
-    // Change the instructions if needed
-    const newInstructions = {
-      ...this.instructions(),
-      first: true,
-    };
-
-    // Pass the new instructions to the repository
-    this.repository().apiInstructions = newInstructions;
-
-    // continue normally
-    return null;
-  }
 }
 
-export type MyModelInterface = IncoreModelInterface<MyModel>;
+export type MyModelInterface = IncoreModelInterface<MyModel>
 ```
 
 ### Other properties that can be returned
 
 ```typescript
 return {
-  code: IncoreResponseCode.OK,
-  redirectTo: "http://example.com",
-  html: "<DOCTYPE html>...html code",
-  js: "JavaScript code",
-  text: "Text code",
-};
+    code: IncoreResponseCode.OK,
+    redirectTo: 'http://example.com',
+    html: '<DOCTYPE html>...html code',
+    js: 'JavaScript code',
+    text: 'Text code',
+}
 ```
 
 Now let's call this method directly through JSON
@@ -1002,12 +1095,12 @@ POST http://localhost:3000/v1/my/endpoint/create
 
 ```json
 {
-  "doSomething": ["that simple", 1, true],
+    "doSomething": ["that simple", 1, true],
 
-  "data": {
-    "name": "John",
-    "email": "abc@example.com"
-  }
+    "data": {
+        "name": "John",
+        "email": "abc@example.com"
+    }
 }
 ```
 
@@ -1021,10 +1114,10 @@ To receive uploads there are two unique steps
 
 ```json
 {
-  "uploads": {
-    "path": "/var/www/html/site/",
-    "baseUrl": "http://example.com"
-  }
+    "uploads": {
+        "path": "/var/www/html/site/",
+        "baseUrl": "http://example.com"
+    }
 }
 ```
 
@@ -1036,45 +1129,45 @@ mediaMiddleware
 ```
 
 ```typescript
-import { authMiddleware, uploadService, mediaMiddleware } from "incore";
+import { authMiddleware, uploadService, mediaMiddleware } from 'incore'
 
 const uploadMiddlewareHandlers: IncoreApiRouteHandler[] = [
-  {
-    handler: authMiddleware, // <--- if you need authentication
-  },
-  {
-    handler: uploadService, // <--- first this
-  },
-  {
-    handler: mediaMiddleware, // <--- then this
-  },
-];
+    {
+        handler: authMiddleware, // <--- if you need authentication
+    },
+    {
+        handler: uploadService, // <--- first this
+    },
+    {
+        handler: mediaMiddleware, // <--- then this
+    },
+]
 
 const uploadMiddleware: IncoreApiRouteMiddleware[] = [
-  {
-    action: "CREATE",
-    middleware: uploadMiddlewareHandlers,
-  },
-  {
-    action: "UPDATE",
-    middleware: uploadMiddlewareHandlers,
-  },
-];
+    {
+        action: 'CREATE',
+        middleware: uploadMiddlewareHandlers,
+    },
+    {
+        action: 'UPDATE',
+        middleware: uploadMiddlewareHandlers,
+    },
+]
 
 // Assign on your routes that need uploading
 
 export const myRoutes: IncoreRouteConfig[] = [
-  {
-    path: "/cars",
-    model: Car,
-    middleware: uploadMiddleware,
-  },
-  {
-    path: "/cars/docs",
-    model: Docs,
-    middleware: uploadMiddleware,
-  },
-];
+    {
+        path: '/cars',
+        model: Car,
+        middleware: uploadMiddleware,
+    },
+    {
+        path: '/cars/docs',
+        model: Docs,
+        middleware: uploadMiddleware,
+    },
+]
 ```
 
 In general you will only need to upload in CREATE and UPDATE actions, that is, POST and UPDATE
@@ -1083,16 +1176,16 @@ That's all you need! To get the images just send in the "embed" instruction like
 
 ```json
 {
-  "embed": "media"
+    "embed": "media"
 }
 ```
 
 Will return all uploads with results
 
 ```typescript
-data.item.media.foreach((m) => {
-  console.log(m.url);
-});
+data.item.media.foreach(m => {
+    console.log(m.url)
+})
 ```
 
 ## most necessary media properties
