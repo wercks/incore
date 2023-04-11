@@ -107,6 +107,11 @@ _knexfile.js_
 ```typescript
 const app = async () => {
   const app = express();
+
+  app.use(cors());
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
   let server: Server;
 
   const port = PORT || 3000;
@@ -1116,3 +1121,7 @@ color_filter, format, mimetype, resolution, aspect_ratio,
 bit_rate, frame_rate, channels, sampling_rate, commercial_name,
 compression_mode, bit_depth, size
 ```
+
+# Licença
+
+[`ISC`](https://github.com/wercks/incore/blob/master/LICENSE)
