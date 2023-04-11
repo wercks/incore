@@ -190,9 +190,7 @@ role object properties
 
 ## Creating, updating and removing roles
 
-```http
-Authorization bearer TOKEN
-```
+**Authorization bearer TOKEN**
 
 ```http
 POST /roles/create (application/json)
@@ -214,12 +212,10 @@ With this we can create our roles and leave them in storage to assign them to us
 
 Have the role and user ID "on hands"
 
-```http
-  Authorization bearer TOKEN
-```
+**Authorization bearer TOKEN**
 
 ```http
-  POST /users/roles/create (application/json)
+POST http://localhost:3000/v1/users/roles/create
 ```
 
 ```JSON
@@ -234,7 +230,7 @@ Have the role and user ID "on hands"
 **Deleting**
 
 ```http
-   DELETE /users/roles/del?id=ENCRYPTED_ID
+DELETE http://localhost:3000/v1/users/roles/del?id=ENCRYPTED_ID
 ```
 
 Protect this route in the **incore.json** file in **routesRoles** delegating who can create or add users, add these
@@ -1115,7 +1111,3 @@ color_filter, format, mimetype, resolution, aspect_ratio,
 bit_rate, frame_rate, channels, sampling_rate, commercial_name,
 compression_mode, bit_depth, size
 ```
-
-# License
-
-[`ISC`](https://github.com/wercks/incore/blob/master/LICENSE)

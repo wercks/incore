@@ -196,12 +196,10 @@ propriedades do objeto Role
 
 ## Criando, atualizando e removendo roles
 
-```http
-  Authorization bearer TOKEN
-```
+**Authorization bearer TOKEN**
 
 ```http
-  POST /roles/create (application/json)
+  POST http://localhost:3000/v1/roles/create
 ```
 
 ```JSON
@@ -220,12 +218,10 @@ Com isso podemos criar nossas roles e deixar guardadas para atribuí-las aos usu
 
 Tenha em "mãos" o ID da role e do usuário
 
-```http
-  Authorization bearer TOKEN
-```
+**Authorization bearer TOKEN**
 
 ```http
-  POST /users/roles/create (application/json)
+  POST http://localhost:3000/v1/users/roles/create
 ```
 
 ```JSON
@@ -726,7 +722,7 @@ PUT http://localhost:3000/v1/cars/update
 ou se não enviar o "id" na instrução
 
 ```http
-PUT http://localhost:3000/v1/cars/update/[ID_CRIPTOGRAFADO]
+PUT http://localhost:3000/v1/cars/update/ID_CRIPTOGRAFADO
 ```
 
 ```json
