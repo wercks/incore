@@ -116,9 +116,12 @@ export declare class Incore {
     static uploadsBaseUrl(addPath?: string): string;
     static uploadsPath(addPath?: string): string;
     static checkSecurityKey(): Promise<void>;
+    static encrypt(data: any): string;
     static encryptId(data: any, idColumn: any): void;
+    static isMetadataIdEncrypted(metadataIdContent: any): boolean;
     static decrypt(data: any): string;
     static searchAndDecrypt(data: any): void;
+    static searchAndEncrypt(data: any, idColumn: any): void;
     static isEncrypted(data: any): boolean;
     static get rootPath(): string;
 }
