@@ -201,7 +201,7 @@ POST /roles/create (application/json)
 
 ```JSON
 {
-    "date": {
+    "data": {
         "name": "Moderators",
         "uniq_id": "moderators",
         "description": "Moderators group"
@@ -396,7 +396,7 @@ You can omit the operator if it is **=**
 
 ```json
 {
-  "date": {
+  "data": {
     "...": "..."
   },
   "conflict": [
@@ -1323,7 +1323,7 @@ POST http://localhost:3000/v1/metadata/create
 PUT http://localhost:3000/v1/metadata/update
 ```
 
-We now set on **"date"**
+We now set on **"data"**
 
 ```http
 POST http://localhost:3000/v1/metadata/create
