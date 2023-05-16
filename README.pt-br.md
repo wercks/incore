@@ -80,7 +80,8 @@ As propriedades _accessTokenExpiresIn_ e _refreshTokenExpiresIn_ são expressada
       "/users/create": ["admin"],
       "r:REGEX_PATTERN": ["admin"]
     },
-    "newUsersRoles": ["users", "members"]
+    "newUsersRoles": ["users", "members"],
+    "encryptId": true
   },
   "test": {},
   "preview": {},
@@ -91,6 +92,8 @@ As propriedades _accessTokenExpiresIn_ e _refreshTokenExpiresIn_ são expressada
 Na propriedade **routesRoles** é possível controlar as roles em rotas de forma geral, para controlar em ações especificas você usará o **roleMiddleware**. Se começar e terminar um path em routeRoles com "/", exemplo: "/users/" isso significa que para listar tudo será restrito, somente vai listar se enviar um ID
 
 Em **auth.algorithm** são aceitos os mesmos valores usados pelo JWT
+
+**encryptId** determina se ID dos resultados retornará criptografado, a criptografia do ID ajuda na segurança, mas caso você precise do número, marque está propriedade como **false**
 
 ```text
  "HS256" | "HS384" | "HS512" | "RS256" | "RS384" | "RS512" |

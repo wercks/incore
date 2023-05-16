@@ -66,6 +66,7 @@ export interface IncoreConfigEnv {
     incoreState: number;
     routesRoles: RoutesRoles;
     newUsersRoles: string[];
+    encryptId: boolean;
 }
 export declare class Incore {
     private static _router;
@@ -94,6 +95,7 @@ export declare class Incore {
     static get accessTokenExpiration(): number | string;
     static get refreshTokenExpiration(): number | string;
     static get algorithm(): Algorithm | undefined;
+    static get encId(): boolean;
     static get knex(): knex.Knex;
     static get isTest(): boolean;
     static get isDev(): boolean;
